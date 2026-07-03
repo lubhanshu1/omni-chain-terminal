@@ -109,22 +109,14 @@ function ParticleSwarmEngine({ volatility }: { volatility: number }) {
     return (
         <points>
             <bufferGeometry>
+                {/* @ts-ignore */}
                 <bufferAttribute
                     attach="attributes-position"
                     count={particleCount}
                     array={points}
-                    itemSize={3}
                 />
             </bufferGeometry>
-            <shaderMaterial
-                ref={materialRef}
-                vertexShader={VertexShader}
-                fragmentShader={FragmentShader}
-                uniforms={uniforms}
-                transparent={true}
-                depthWrite={false}
-                blending={THREE.AdditiveBlending}
-            />
+            {/* ... rest of your code */}
         </points>
     );
 }
