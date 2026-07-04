@@ -109,21 +109,31 @@ function ParticleSwarmEngine({ volatility }: { volatility: number }) {
     return (
         <points>
             <bufferGeometry>
-                {/* @ts-ignore */}
+                {/* STRICT TYPE FIX FOR VERCEL DEPLOYMENT */}
                 <bufferAttribute
                     attach="attributes-position"
+                    args={[points, 3]}
                     count={particleCount}
                     array={points}
+                    itemSize={3}
                 />
             </bufferGeometry>
-            {/* ... rest of your code */}
+            <shaderMaterial
+                ref={materialRef}
+                vertexShader={VertexShader}
+                fragmentShader={FragmentShader}
+                uniforms={uniforms}
+                transparent={true}
+                depthWrite={false}
+                blending={THREE.AdditiveBlending}
+            />
         </points>
     );
 }
 
 export default function EngineView({ marketVolatility = 0.15 }: { marketVolatility?: number }) {
     return (
-        <div className="w-full h-screen bg-black fixed inset-0 z-0 flex justify-center items-center">
+        <div className="w-full h-screen bg-black fixed inset-0 z-0 flex justify-center items-center pointer-events-none">
             {/* Pushed camera back to Z:25 to see the full majestic height of the vortex */}
             <Canvas camera={{ position: [0, 0, 25], fov: 45 }} dpr={[1, 2]}>
                 <ParticleSwarmEngine volatility={marketVolatility} />
