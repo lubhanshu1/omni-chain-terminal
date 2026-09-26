@@ -8,7 +8,7 @@ import { useCryptoStream } from './hooks/useCryptoStream';
 const EngineView = dynamic(() => import('./components/EngineView'), { ssr: false });
 
 export default function Home() {
-  const { price, volatility } = useCryptoStream();
+  const { price, volatility, is24hUp, status } = useCryptoStream();
 
   // --- STATE FOR ADVANCED WIDGETS ---
   // 1. ZK-Proof Simulator State
@@ -139,7 +139,7 @@ export default function Home() {
           {/* CENTER COLUMN: CORE ORACLE & INTENT SWAP */}
           <div className="col-span-12 lg:col-span-6 flex flex-col justify-center items-center relative pointer-events-none">
 
-            <h1 className="text-7xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-4 leading-none mix-blend-screen text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">
+            <div className={`mb-3 flex items-center gap-3 text-[9px] tracking-[0.25em] ${status === "connected" ? "text-emerald-400" : "text-amber-400"}`}><span>● {status.toUpperCase()}</span><span className={is24hUp ? "text-emerald-400" : "text-rose-400"}>{is24hUp ? "24H ▲" : "24H ▼"}</span></div><h1 className="text-7xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-4 leading-none mix-blend-screen text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">
               ${price.split('.')[0]}<span className="text-4xl text-cyan-500">.{price.split('.')[1]}</span>
             </h1>
 
@@ -209,11 +209,11 @@ export default function Home() {
 
               <div className="space-y-2 border-l border-cyan-900/50 pl-3">
                 <div className="flex justify-between items-center text-[9px] tracking-wider">
-                  <span className="text-neutral-500">L1 STAKING (REFERENCE)</span>
+                  <span className="text-neutral-500">L1 STAKING (ILLUSTRATIVE)</span>
                   <span className="text-white">+{baseYield}% APY</span>
                 </div>
                 <div className="flex justify-between items-center text-[9px] tracking-wider">
-                  <span className="text-neutral-500">RESTAKING (REFERENCE)</span>
+                  <span className="text-neutral-500">RESTAKING (ILLUSTRATIVE)</span>
                   <span className="text-purple-400">+{restakingYield}% APY</span>
                 </div>
                 <div className="w-full h-[1px] bg-white/10 my-1" />
