@@ -38,7 +38,7 @@ const VertexShader = `
     vAlpha = smoothstep(8.0, 0.0, distanceFromCenter);
     
     // Ultra-fine particle sizing based on depth
-    gl_PointSize = clamp(2.5 * (100.0 / max(-modelViewPosition.z, 1.0)), 1.0, 8.0);
+    gl_PointSize = 2.5 * (100.0 / -modelViewPosition.z);
   }
 `;
 
@@ -73,19 +73,21 @@ function ParticleSwarmEngine({ volatility }: { volatility: number }) {
     // 8,000 points is the perfect balance for a clean, sparse look without lagging
     const particleCount = 8000;
 
-    const geometry = useMemo(() => {
+    const points = useMemo(() => {
         const coords = new Float32Array(particleCount * 3);
         for (let i = 0; i < particleCount; i++) {
-            const y = (Math.random() - 0.5) * 40;
+            // Distribute points in a tall vertical funnel
+            const y = (Math.random() - 0.5) * 40; // Height spread from -20 to 20
+
+            // Radius pinches slightly in the middle, wider at top/bottom
             const radius = 2.0 + Math.random() * 2.5 + Math.abs(y) * 0.05;
             const angle = Math.random() * Math.PI * 2;
-            coords[i * 3] = Math.cos(angle) * radius;
-            coords[i * 3 + 1] = y;
-            coords[i * 3 + 2] = Math.sin(angle) * radius;
+
+            coords[i * 3] = Math.cos(angle) * radius;     // X
+            coords[i * 3 + 1] = y;                        // Y
+            coords[i * 3 + 2] = Math.sin(angle) * radius; // Z
         }
-        const g = new THREE.BufferGeometry();
-        g.setAttribute('position', new THREE.BufferAttribute(coords, 3));
-        return g;
+        return coords;
     }, []);
 
     const uniforms = useMemo(() => ({
@@ -106,7 +108,16 @@ function ParticleSwarmEngine({ volatility }: { volatility: number }) {
 
     return (
         <points>
-            <primitive object={geometry} />
+            <bufferGeometry>
+                {/* STRICT TYPE FIX FOR VERCEL DEPLOYMENT */}
+                <bufferAttribute
+                    attach="attributes-position"
+                    args={[points, 3]}
+                    count={particleCount}
+                    array={points}
+                    itemSize={3}
+                />
+            </bufferGeometry>
             <shaderMaterial
                 ref={materialRef}
                 vertexShader={VertexShader}
@@ -124,7 +135,7 @@ export default function EngineView({ marketVolatility = 0.15 }: { marketVolatili
     return (
         <div className="w-full h-screen bg-black fixed inset-0 z-0 flex justify-center items-center pointer-events-none">
             {/* Pushed camera back to Z:25 to see the full majestic height of the vortex */}
-            <Canvas camera={{ position: [0, 0, 25], fov: 45 }} dpr={[1, 1.5]}>
+            <Canvas camera={{ position: [0, 0, 25], fov: 45 }} dpr={[1, 2]}>
                 <ParticleSwarmEngine volatility={marketVolatility} />
             </Canvas>
         </div>

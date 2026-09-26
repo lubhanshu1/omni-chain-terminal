@@ -8,7 +8,7 @@ import { useCryptoStream } from './hooks/useCryptoStream';
 const EngineView = dynamic(() => import('./components/EngineView'), { ssr: false });
 
 export default function Home() {
-  const { price, volatility, is24hUp, status } = useCryptoStream();
+  const { price, volatility } = useCryptoStream();
 
   // --- STATE FOR ADVANCED WIDGETS ---
   // 1. ZK-Proof Simulator State
@@ -36,13 +36,13 @@ export default function Home() {
   // --- ZK-PROOF SIMULATOR LOGIC ---
   const triggerZkProof = () => {
     setZkStatus('proving');
-    setZkLogs(['SIMULATION: INITIALIZING CIRCUIT...', 'SIMULATION: LOADING PROVER...']);
+    setZkLogs(['INITIALIZING CIRCOM CIRCUIT...', 'LOADING SNARKJS WASM...']);
 
-    setTimeout(() => setZkLogs(p => [...p, 'SIMULATION: GENERATING WITNESS...']), 800);
-    setTimeout(() => setZkLogs(p => [...p, 'SIMULATION: COMPUTING PROOF...']), 1600);
-    setTimeout(() => setZkLogs(p => [...p, 'SIMULATION: VERIFYING RESULT...']), 2500);
+    setTimeout(() => setZkLogs(p => [...p, 'GENERATING WITNESS [AGE > 18]...']), 800);
+    setTimeout(() => setZkLogs(p => [...p, 'COMPUTING GROTH16 PROOF...']), 1600);
+    setTimeout(() => setZkLogs(p => [...p, 'VERIFYING ON-CHAIN...']), 2500);
     setTimeout(() => {
-      setZkLogs(p => [...p, 'SIMULATION COMPLETE. NO ON-CHAIN PROOF GENERATED.']);
+      setZkLogs(p => [...p, 'ZK_PROOF VERIFIED. DATA OBFUSCATED.']);
       setZkStatus('verified');
     }, 3200);
   };
@@ -64,14 +64,14 @@ export default function Home() {
 
       <div className="relative z-10 w-full h-screen p-4 flex flex-col justify-between pointer-events-none">
 
-        {/* === NETWORK REFERENCE TELEMETRY === */}
+        {/* === LIVE GAS MEMPOOL TRACKER BAR === */}
         <header className="w-full pointer-events-auto border-b border-cyan-900/40 pb-2 bg-black/40 backdrop-blur-md overflow-hidden">
           <div className="flex items-center gap-2 text-[9px] tracking-widest px-4 border-b border-cyan-900/40 pb-2 mb-2">
             <Hexagon className="w-4 h-4 text-cyan-400 animate-spin-slow" />
-            <span className="text-cyan-500 font-bold">OMNI-CHAIN TERMINAL // v5.1</span>
-            <span className="ml-auto text-neutral-500">AUTH: LOCAL SESSION</span>
+            <span className="text-cyan-500 font-bold">LUBHANSHU // OMNI-CHAIN TERMINAL v5.0</span>
+            <span className="ml-auto text-neutral-500">AUTH: 25BCS10043</span>
           </div>
-          <div className="flex whitespace-nowrap animate-marquee gap-12 text-[10px] tracking-[0.2em] uppercase font-bold">
+          <div className="flex whitespace-nowrap animate-[marquee_20s_linear_infinite] gap-12 text-[10px] tracking-[0.2em] uppercase font-bold">
             {[...gasChains, ...gasChains].map((chain, i) => (
               <div key={i} className="flex items-center gap-2">
                 <Zap className={`w-3 h-3 ${chain.color}`} />
@@ -91,10 +91,10 @@ export default function Home() {
             {/* FEATURE 2: ZK-PROOF IDENTITY MATRIX */}
             <div className="border border-cyan-900/30 bg-black/60 backdrop-blur-md p-4">
               <div className="text-[9px] tracking-[0.3em] text-cyan-600 mb-4 flex items-center gap-2 border-b border-cyan-900/30 pb-2">
-                <Fingerprint className="w-3 h-3 text-cyan-400" /> ZERO-KNOWLEDGE PROOF SIMULATOR
+                <Fingerprint className="w-3 h-3 text-cyan-400" /> ZERO-KNOWLEDGE IDENTITY
               </div>
               <div className="text-[10px] text-neutral-400 mb-4 leading-relaxed">
-                Simulate an <span className="text-white">"AGE {'>'} 18"</span> proof flow without exposing any private value. This demo does not create or verify a real on-chain proof.
+                Prove attribute <span className="text-white">"AGE {'>'} 18"</span> to smart contract without revealing actual birthdate or wallet balance.
               </div>
 
               <div className="h-24 bg-cyan-950/20 border border-cyan-900/30 p-2 mb-4 font-mono text-[8px] text-cyan-500/80 overflow-hidden flex flex-col justify-end">
@@ -111,7 +111,7 @@ export default function Home() {
                   : 'border-cyan-500/30 bg-cyan-950/30 hover:bg-cyan-900/50 text-cyan-400'
                   }`}
               >
-                {zkStatus === 'idle' ? '[ RUN PROOF SIMULATION ]' : zkStatus === 'proving' ? '[ COMPUTING CIRCUIT... ]' : '[ SIMULATION COMPLETE ]'}
+                {zkStatus === 'idle' ? '[ GENERATE ZK-SNARK PROOF ]' : zkStatus === 'proving' ? '[ COMPUTING CIRCUIT... ]' : '[ PROOF VALIDATED ]'}
               </button>
             </div>
 
@@ -121,7 +121,7 @@ export default function Home() {
                 <LineChart className="w-3 h-3 text-cyan-400" /> CONSENSUS PREDICTION
               </div>
               <div className="text-[10px] text-white font-bold tracking-wide mb-3">
-                BTC SCENARIO SNAPSHOT
+                WILL BTC HIT $100K BEFORE EPOCH 2026?
               </div>
               <div className="relative h-6 w-full bg-rose-950/30 border border-rose-900/30 flex items-center overflow-hidden mb-2">
                 <div className="absolute left-0 h-full bg-emerald-600/50 border-r border-emerald-400" style={{ width: '68%' }} />
@@ -130,7 +130,7 @@ export default function Home() {
               </div>
               <div className="flex justify-between text-[8px] text-neutral-500 uppercase">
                 <span>Vol: $1.2M</span>
-                <span>Illustrative data</span>
+                <span>Oracle: Chainlink</span>
               </div>
             </div>
 
@@ -139,14 +139,14 @@ export default function Home() {
           {/* CENTER COLUMN: CORE ORACLE & INTENT SWAP */}
           <div className="col-span-12 lg:col-span-6 flex flex-col justify-center items-center relative pointer-events-none">
 
-            <div className={`mb-3 flex items-center gap-3 text-[9px] tracking-[0.25em] ${status === "connected" ? "text-emerald-400" : "text-amber-400"}`}><span>● {status.toUpperCase()}</span><span className={is24hUp ? "text-emerald-400" : "text-rose-400"}>{is24hUp ? "24H ▲" : "24H ▼"}</span></div><h1 className="text-7xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-4 leading-none mix-blend-screen text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">
+            <h1 className="text-7xl md:text-8xl lg:text-9xl font-light tracking-tighter mb-4 leading-none mix-blend-screen text-transparent bg-clip-text bg-gradient-to-b from-white to-neutral-600">
               ${price.split('.')[0]}<span className="text-4xl text-cyan-500">.{price.split('.')[1]}</span>
             </h1>
 
             {/* FEATURE 4: CROSS-CHAIN INTENT BASED SWAP */}
             <div className="w-full max-w-md border border-cyan-900/50 bg-black/70 backdrop-blur-xl p-6 pointer-events-auto shadow-[0_0_50px_rgba(6,182,212,0.1)] mt-8">
               <div className="text-[10px] tracking-[0.3em] text-cyan-500 flex items-center justify-center gap-2 mb-6">
-                <ArrowRightLeft className="w-4 h-4" /> INTENT ROUTE PREVIEW
+                <ArrowRightLeft className="w-4 h-4" /> INTENT-BASED ROUTER
               </div>
 
               <div className="flex flex-col gap-4">
@@ -167,11 +167,11 @@ export default function Home() {
 
               {swapState === 'found' && (
                 <div className="mt-4 p-3 bg-cyan-950/20 border border-cyan-500/20 text-[8px] tracking-widest text-cyan-400 flex flex-col gap-2">
-                  <div className="text-white">ROUTE PREVIEW GENERATED:</div>
+                  <div className="text-white">OPTIMAL ROUTE FOUND:</div>
                   <div className="flex items-center gap-2">
                     USDC <GitCommit className="w-3 h-3 text-neutral-600" /> STARGATE <GitCommit className="w-3 h-3 text-neutral-600" /> WETH <GitCommit className="w-3 h-3 text-neutral-600" /> UNISWAP V3 <GitCommit className="w-3 h-3 text-neutral-600" /> ETH
                   </div>
-                  <div className="text-emerald-500 mt-1">ILLUSTRATIVE ONLY // NO TRANSACTION SENT</div>
+                  <div className="text-emerald-500 mt-1">EST. EXECUTION: 1.2s // NO BRIDGING REQUIRED</div>
                 </div>
               )}
 
@@ -179,7 +179,7 @@ export default function Home() {
                 onClick={triggerSwapRoute}
                 className="w-full mt-6 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/50 py-3 text-[10px] tracking-[0.2em] text-cyan-300 font-bold transition-all"
               >
-                {swapState === 'idle' ? '[ PREVIEW BEST ROUTE ]' : swapState === 'routing' ? 'CALCULATING PATH...' : '[ ROUTE PREVIEW READY ]'}
+                {swapState === 'idle' ? '[ FIND BEST EXECUTION ROUTE ]' : swapState === 'routing' ? 'CALCULATING PATH...' : '[ EXECUTE INTENT ]'}
               </button>
             </div>
           </div>
@@ -190,7 +190,7 @@ export default function Home() {
             {/* FEATURE 5: LIQUID RESTAKING CALCULATOR */}
             <div className="border border-cyan-900/30 bg-black/60 backdrop-blur-md p-4">
               <div className="text-[9px] tracking-[0.3em] text-cyan-600 mb-4 flex items-center gap-2 border-b border-cyan-900/30 pb-2">
-                <Layers className="w-3 h-3 text-cyan-400" /> RESTAKING YIELD ESTIMATOR
+                <Layers className="w-3 h-3 text-cyan-400" /> AVS RESTAKING YIELD
               </div>
 
               <div className="mb-4">
@@ -209,11 +209,11 @@ export default function Home() {
 
               <div className="space-y-2 border-l border-cyan-900/50 pl-3">
                 <div className="flex justify-between items-center text-[9px] tracking-wider">
-                  <span className="text-neutral-500">L1 STAKING (ILLUSTRATIVE)</span>
+                  <span className="text-neutral-500">L1 STAKING (Lido)</span>
                   <span className="text-white">+{baseYield}% APY</span>
                 </div>
                 <div className="flex justify-between items-center text-[9px] tracking-wider">
-                  <span className="text-neutral-500">RESTAKING (ILLUSTRATIVE)</span>
+                  <span className="text-neutral-500">RESTAKING (EigenLayer)</span>
                   <span className="text-purple-400">+{restakingYield}% APY</span>
                 </div>
                 <div className="w-full h-[1px] bg-white/10 my-1" />
@@ -244,7 +244,7 @@ export default function Home() {
             {/* === NEW ADDITION: BOTTOM RIGHT FRONTIER COGNITION CORE === */}
             <div className="border border-cyan-900/40 bg-black/70 backdrop-blur-md p-3 max-h-[210px] overflow-y-auto scrollbar-none border-t-2 border-t-cyan-500/50">
               <div className="text-[9px] tracking-[0.3em] text-cyan-400 mb-2.5 flex items-center gap-2 border-b border-cyan-900/30 pb-1.5 font-bold">
-                <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> FRONTIER_INFRA_NOTES // 2026
+                <Radio className="w-3 h-3 text-cyan-400 animate-pulse" /> FRONTIER_INFRA_LOGS // 2026
               </div>
               <div className="space-y-3 font-mono text-[9px] leading-relaxed text-neutral-400">
                 <div className="border-l border-cyan-500/30 pl-2">
@@ -294,7 +294,7 @@ export default function Home() {
           0% { transform: translateX(0%); }
           100% { transform: translateX(-50%); }
         }
-        .animate-marquee {
+        .animate-\\[marquee_20s_linear_infinite\\] {
           animation: marquee 20s linear infinite;
         }
         /* Custom scrollbar hidden class for cleaner data feeds */

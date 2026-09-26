@@ -50,9 +50,9 @@ export default function NavigationDock() {
             <div className="flex items-center gap-4 text-[8px] tracking-[0.3em] font-mono text-neutral-500 bg-black/40 backdrop-blur-md px-6 py-1 rounded-full border border-white/5">
                 <span className="flex items-center gap-1 text-emerald-400"><Activity className="w-2.5 h-2.5" /> ONLINE</span>
                 <span>|</span>
-                <span className="flex items-center gap-1 text-cyan-600"><Globe className="w-2.5 h-2.5" /> GLOBAL_NETWORK</span>
+                <span className="flex items-center gap-1 text-cyan-600"><Globe className="w-2.5 h-2.5" /> GANGWA_IN</span>
                 <span>|</span>
-                <span className="text-cyan-500">OMNI CORE</span>
+                <span className="text-cyan-500">ARCHITECT: LUBHANSHU (25BCS10043)</span>
                 <span>|</span>
                 <span className="text-neutral-400 font-bold">{time} IST</span>
             </div>

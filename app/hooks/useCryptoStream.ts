@@ -1,86 +1,32 @@
 import { useState, useEffect } from 'react';
 
-type StreamStatus = 'connecting' | 'connected' | 'reconnecting' | 'offline';
-
 export function useCryptoStream() {
-    const [price, setPrice] = useState<string>('--');
+    const [price, setPrice] = useState<string>('0.00');
     const [volatility, setVolatility] = useState<number>(0.15);
     const [is24hUp, setIs24hUp] = useState<boolean>(true);
-    const [status, setStatus] = useState<StreamStatus>('connecting');
 
     useEffect(() => {
-        let ws: WebSocket | null = null;
-        let retryTimer: ReturnType<typeof setTimeout> | null = null;
-        let disposed = false;
-        let retryMs = 1000;
+        // Connect directly to Binance raw aggregate trade WebSocket stream for BTC/USDT
+        const ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
 
-        const connect = () => {
-            if (disposed) return;
-            setStatus(retryMs === 1000 ? 'connecting' : 'reconnecting');
+        ws.onmessage = (event) => {
+            const data = JSON.parse(event.data);
 
-            try {
-                ws = new WebSocket('wss://stream.binance.com:9443/ws/btcusdt@ticker');
-            } catch {
-                scheduleRetry();
-                return;
+            // c: Current close price, p: Price change, P: Price change percent
+            if (data.c) {
+                setPrice(parseFloat(data.c).toLocaleString(undefined, { minimumFractionDigits: 2 }));
+                setIs24hUp(parseFloat(data.p) >= 0);
+
+                // Mathematically map the absolute 24h price change percentage to our shader's volatility spectrum [0.0 - 1.0]
+                const rawPercent = Math.abs(parseFloat(data.P));
+                const normalizedVolatility = Math.min(Math.max(rawPercent / 5, 0.05), 1.0);
+                setVolatility(normalizedVolatility);
             }
-
-            ws.onopen = () => {
-                retryMs = 1000;
-                setStatus('connected');
-            };
-
-            ws.onmessage = (event) => {
-                try {
-                    const data = JSON.parse(event.data);
-                    const close = Number(data?.c);
-                    const change = Number(data?.p);
-                    const changePercent = Number(data?.P);
-
-                    if (!Number.isFinite(close) || !Number.isFinite(change) || !Number.isFinite(changePercent)) {
-                        return;
-                    }
-
-                    setPrice(close.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
-                    setIs24hUp(change >= 0);
-
-                    const normalizedVolatility = Math.min(Math.max(Math.abs(changePercent) / 5, 0.05), 1);
-                    setVolatility(normalizedVolatility);
-                } catch {
-                    // Ignore malformed stream messages without breaking the dashboard.
-                }
-            };
-
-            ws.onerror = () => {
-                setStatus('offline');
-                ws?.close();
-            };
-
-            ws.onclose = () => {
-                if (!disposed) scheduleRetry();
-            };
         };
 
-        const scheduleRetry = () => {
-            if (disposed || retryTimer) return;
-            setStatus('reconnecting');
-            retryTimer = setTimeout(() => {
-                retryTimer = null;
-                retryMs = Math.min(retryMs * 2, 30000);
-                connect();
-            }, retryMs);
-        };
-
-        connect();
-
-        return () => {
-            disposed = true;
-            if (retryTimer) clearTimeout(retryTimer);
-            retryTimer = null;
-            ws?.close();
-            ws = null;
-        };
+        ws.onerror = (err) => console.error('WebSocket Streaming Error:', err);
+        return () => ws.close();
     }, []);
 
-    return { price, volatility, is24hUp, status };
+    return { price, volatility, is24hUp };
 }
