@@ -71,7 +71,7 @@ export default function Home() {
             <span className="text-cyan-500 font-bold">OMNI-CHAIN TERMINAL // v5.1</span>
             <span className="ml-auto text-neutral-500">AUTH: LOCAL SESSION</span>
           </div>
-          <div className="flex whitespace-nowrap animate-[marquee_20s_linear_infinite] gap-12 text-[10px] tracking-[0.2em] uppercase font-bold">
+          <div className="flex whitespace-nowrap animate-marquee gap-12 text-[10px] tracking-[0.2em] uppercase font-bold">
             {[...gasChains, ...gasChains].map((chain, i) => (
               <div key={i} className="flex items-center gap-2">
                 <Zap className={`w-3 h-3 ${chain.color}`} />
@@ -294,7 +294,7 @@ export default function Home() {
           0% { transform: translateX(0%); }
           100% { transform: translateX(-50%); }
         }
-        .animate-\\[marquee_20s_linear_infinite\\] {
+        .animate-marquee {
           animation: marquee 20s linear infinite;
         }
         /* Custom scrollbar hidden class for cleaner data feeds */
